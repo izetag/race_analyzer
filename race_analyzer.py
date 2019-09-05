@@ -164,7 +164,7 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
 def main():
    parser = argparse.ArgumentParser()
    parser.add_argument('--csv')
-   parser.add_argument('--chart')
+   parser.add_argument('--chart-dir')
    parser.add_argument('--hist-left-bound', type=float)
    parser.add_argument('--hist-right-bound', type=float)
    parser.add_argument('--only-pilot')
@@ -177,10 +177,10 @@ def main():
    
    figure_list = plot(filtered, statistics, bounds=hist_bounds)
    
-   if args.chart:
+   if args.chart_dir:
        for figure in figure_list:
-           chart_path = args.chart + '/' + figure.canvas.get_window_title() + '.png'
-           print(chart_path)
+           chart_path = args.chart_dir + '/' + figure.canvas.get_window_title() + '.png'
+           #print(chart_path)
            figure.savefig(chart_path, format='png', dpi=200)
    else:
        plt.show()
