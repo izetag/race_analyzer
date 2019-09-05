@@ -72,10 +72,10 @@ def plot_hist(ax, data, labels=None, bin_width=1.0, bounds=None):
    bins = np.unique(np.concatenate(([math.floor(concatenated.min())], np.arange(math.floor(bounds[0]), math.ceil(bounds[1]), bin_width), [math.ceil(concatenated.max())])))
    ax.set_xlim(bounds)
    ax.minorticks_on()
-   ax.xaxis.set_major_locator(ticker.MultipleLocator(2))
+   ax.xaxis.set_major_locator(ticker.MultipleLocator(5))
    ax.xaxis.set_minor_locator(ticker.MultipleLocator(1))
-   ax.yaxis.set_major_locator(ticker.MultipleLocator(5))
-   ax.yaxis.set_minor_locator(ticker.MultipleLocator(1))
+   ax.yaxis.set_major_locator(ticker.MultipleLocator(10))
+   ax.yaxis.set_minor_locator(ticker.MultipleLocator(2))
    ax.grid(which='both')
    (n, bins, patches) = ax.hist(
       data,
@@ -98,9 +98,9 @@ def plot_cumbest(ax, data):
       x.append(series.idxmin(y[-1]) + 1)
 
    ax.minorticks_on()
-   ax.xaxis.set_major_locator(ticker.MultipleLocator(5))
-   ax.xaxis.set_minor_locator(ticker.MultipleLocator(1))
-   ax.yaxis.set_major_locator(ticker.MultipleLocator(2))
+   ax.xaxis.set_major_locator(ticker.MultipleLocator(10))
+   ax.xaxis.set_minor_locator(ticker.MultipleLocator(2))
+   ax.yaxis.set_major_locator(ticker.MultipleLocator(5))
    ax.yaxis.set_minor_locator(ticker.MultipleLocator(1))
    ax.grid(which='both')
    ax.plot(range(1, len(cummin) + 1), cummin)
@@ -133,7 +133,7 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
       figure = plt.figure()
       figure.canvas.set_window_title('Pilot ' + pilot)
       figures.append(figure)
-      axes = figure.subplots(1, 2)
+      axes = figure.subplots(2, 1)
       plot_pilot(comparision_axes[comparision_idx], group, hist_bounds=hist_bounds)
       plot_pilot(axes, group)
       for ax in (comparision_axes[comparision_idx][0], axes[0]):
