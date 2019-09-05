@@ -138,22 +138,22 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
 
       comparision_idx += 1
 
-      xlims = [[minb, maxb], [0, -math.inf]]
-      ylims = [[0, -math.inf], [math.inf, -math.inf]]
-      for i, axes in enumerate(comparision_axes):
-         for j, ax in enumerate(axes):
-            limx = ax.get_xlim()
-            limy = ax.get_ylim()
-            if j != 0:
-               xlims[j] = [min(xlims[j][0], limx[0]), max(xlims[j][1], limx[1])]
-            ylims[j] = [min(ylims[j][0], limy[0]), max(ylims[j][1], limy[1])]
+
+   xlims = [[minb, maxb], [0, -math.inf]]
+   ylims = [[0, -math.inf], [math.inf, -math.inf]]
+   for i, axes in enumerate(comparision_axes):
+      for j, ax in enumerate(axes):
+         limx = ax.get_xlim()
+         limy = ax.get_ylim()
+         if j != 0:
+            xlims[j] = [min(xlims[j][0], limx[0]), max(xlims[j][1], limx[1])]
+         ylims[j] = [min(ylims[j][0], limy[0]), max(ylims[j][1], limy[1])]
 
 
-      for i, axes in enumerate(comparision_axes):
-         for j, ax in enumerate(axes):
-            ax.set_xlim(xlims[j])
-            ax.set_ylim(ylims[j])
-
+   for i, axes in enumerate(comparision_axes):
+      for j, ax in enumerate(axes):
+         ax.set_xlim(xlims[j])
+         ax.set_ylim(ylims[j])
 
    plt.show()
 
