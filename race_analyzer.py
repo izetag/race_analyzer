@@ -7,7 +7,9 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
+import os
 import pandas as pd
+import re
 import seaborn as sns
 
 
@@ -115,13 +117,13 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
    grouped = data.groupby('PILOT')
    print(grouped['s'].describe())
    print(grouped['best3avg'].describe())
-   comparision_figure = plt.figure(figsize=(16, 12))
-   comparision_figure.canvas.set_window_title('Pilots_Comparision')
+   comparision_figure = plt.figure()
+   comparision_figure.canvas.set_window_title('Pilots Comparision')
    comparision_axes = comparision_figure.subplots(len(grouped), 2)
    comparision_idx = 0
 
-   sns_figure = plt.figure(figsize=(16, 12))
-   sns_figure.canvas.set_window_title('Pilot_Violinplot')
+   sns_figure = plt.figure()
+   sns_figure.canvas.set_window_title('Pilot Violinplot')
    LAP_TYPE = 'Lap Type'
    data_long = pd.melt(data, id_vars=('PILOT'), value_vars=('s', 'best3avg'), var_name=LAP_TYPE, value_name='time[s]')
    sns.violinplot(x='PILOT', hue=LAP_TYPE, y='time[s]', data=data_long, ax=sns_figure.gca(), split=True, scale='count')
@@ -131,14 +133,16 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
    hist_bounds = find_hist_bounds(data['s'])
    (minb, maxb) = hist_bounds
    for pilot, group in grouped:
-      figure = plt.figure(figsize=(16, 12))
-      figure.canvas.set_window_title('Chart_By_' + pilot)
+      channels = ','.join(group.CHANNEL.unique())
+      pilot_title = '{}({})'.format(pilot, channels)
+      figure = plt.figure()
+      figure.canvas.set_window_title(pilot_title)
       figures.append(figure)
       axes = figure.subplots(2, 1)
       plot_pilot(comparision_axes[comparision_idx], group, hist_bounds=hist_bounds)
       plot_pilot(axes, group)
       for ax in (comparision_axes[comparision_idx][0], axes[0]):
-         ax.set_title(pilot)
+         ax.set_title(pilot_title)
 
       comparision_idx += 1
 
@@ -162,6 +166,19 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
    return figures
 
 
+def get_valid_filename(s):
+    """
+    Return the given string converted to a string that can be used for a clean
+    filename. Remove leading and trailing spaces; convert other spaces to
+    underscores; and remove anything that is not an alphanumeric, dash,
+    underscore, or dot.
+    >>> get_valid_filename("john's portrait in 2004.jpg")
+    'johns_portrait_in_2004.jpg'
+    """
+    s = str(s).strip().replace(' ', '_')
+    return re.sub(r'(?u)[^-\w.]', '', s)
+
+
 def main():
    parser = argparse.ArgumentParser()
    parser.add_argument('--csv')
@@ -172,18 +189,20 @@ def main():
    args = parser.parse_args()
 
    mpl.rcParams["figure.autolayout"] = True
+   mpl.rcParams["figure.figsize"] = (12, 9)
 
    data = read_data(args.csv)
    filtered = filter_data(data, pilot=args.only_pilot)
    statistics = calculate_statistics(filtered)
    hist_bounds = [args.hist_left_bound, args.hist_right_bound]
-   
+
    figure_list = plot(filtered, statistics, bounds=hist_bounds)
-   
+
    if args.chart_dir:
-       for figure in figure_list:
-           chart_path = args.chart_dir + '/' + figure.canvas.get_window_title() + '.png'
-           #print(chart_path)
+      if not os.path.exists(args.chart_dir):
+         os.makedirs(args.chart_dir)
+      for figure in figure_list:
+           chart_path = args.chart_dir + '/' + get_valid_filename(figure.canvas.get_window_title()) + '.png'
            figure.savefig(chart_path, format='png', dpi=200)
    else:
        plt.show()
@@ -191,5 +210,3 @@ def main():
 
 if __name__ == "__main__":
    main()
-
-
