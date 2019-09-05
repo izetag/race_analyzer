@@ -3,6 +3,7 @@
 import argparse
 import datetime
 import math
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
@@ -167,6 +168,8 @@ def main():
    parser.add_argument('--hist-right-bound', type=float)
    parser.add_argument('--only-pilot')
    args = parser.parse_args()
+
+   mpl.rcParams["figure.autolayout"] = True
 
    data = read_data(args.csv)
    filtered = filter_data(data, pilot=args.only_pilot)
