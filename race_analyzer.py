@@ -33,9 +33,11 @@ def calculate_statistics(data):
       else:
          count = 1
 
-         if row.LAP != lap + 1 or count < 3:
-            data.at[row.Index, 'best3'] = np.nan
-            lap = row.LAP
+      if count < 3:
+         data.at[row.Index, 'best3'] = np.nan
+         lap = row.LAP
+      else:
+         lap += 1
 
    data.loc[:, 'best3avg'] = data['best3'] / 3.0
 
