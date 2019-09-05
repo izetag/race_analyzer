@@ -115,12 +115,13 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
    grouped = data.groupby('PILOT')
    print(grouped['s'].describe())
    print(grouped['best3avg'].describe())
-   comparision_figure = plt.figure()
-   comparision_figure.canvas.set_window_title('Pilots Comparision')
+   comparision_figure = plt.figure(figsize=(16, 12))
+   comparision_figure.canvas.set_window_title('Pilots_Comparision')
    comparision_axes = comparision_figure.subplots(len(grouped), 2)
    comparision_idx = 0
 
-   sns_figure = plt.figure()
+   sns_figure = plt.figure(figsize=(16, 12))
+   sns_figure.canvas.set_window_title('Pilot_Violinplot')
    LAP_TYPE = 'Lap Type'
    data_long = pd.melt(data, id_vars=('PILOT'), value_vars=('s', 'best3avg'), var_name=LAP_TYPE, value_name='time[s]')
    sns.violinplot(x='PILOT', hue=LAP_TYPE, y='time[s]', data=data_long, ax=sns_figure.gca(), split=True, scale='count')
@@ -130,8 +131,8 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
    hist_bounds = find_hist_bounds(data['s'])
    (minb, maxb) = hist_bounds
    for pilot, group in grouped:
-      figure = plt.figure()
-      figure.canvas.set_window_title('Pilot ' + pilot)
+      figure = plt.figure(figsize=(16, 12))
+      figure.canvas.set_window_title('Chart_By_' + pilot)
       figures.append(figure)
       axes = figure.subplots(2, 1)
       plot_pilot(comparision_axes[comparision_idx], group, hist_bounds=hist_bounds)
@@ -158,12 +159,13 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
          ax.set_xlim(xlims[j])
          ax.set_ylim(ylims[j])
 
-   plt.show()
+   return figures
 
 
 def main():
    parser = argparse.ArgumentParser()
    parser.add_argument('--csv')
+   parser.add_argument('--chart-dir')
    parser.add_argument('--hist-left-bound', type=float)
    parser.add_argument('--hist-right-bound', type=float)
    parser.add_argument('--only-pilot')
@@ -175,7 +177,16 @@ def main():
    filtered = filter_data(data, pilot=args.only_pilot)
    statistics = calculate_statistics(filtered)
    hist_bounds = [args.hist_left_bound, args.hist_right_bound]
-   plot(filtered, statistics, bounds=hist_bounds)
+   
+   figure_list = plot(filtered, statistics, bounds=hist_bounds)
+   
+   if args.chart_dir:
+       for figure in figure_list:
+           chart_path = args.chart_dir + '/' + figure.canvas.get_window_title() + '.png'
+           #print(chart_path)
+           figure.savefig(chart_path, format='png', dpi=200)
+   else:
+       plt.show()
 
 
 if __name__ == "__main__":
