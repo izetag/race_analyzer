@@ -114,11 +114,13 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
     print(grouped['best3avg'].describe())
     comparision_figure = plt.figure()
     comparision_figure.canvas.set_window_title('Pilots Comparision')
+    comparision_figure.suptitle('Pilots Comparision')
     comparision_axes = comparision_figure.subplots(len(grouped), 2)
     comparision_idx = 0
 
     sns_figure = plt.figure()
     sns_figure.canvas.set_window_title('Pilot Violinplot')
+    sns_figure.suptitle('Pilot Violinplot')
     LAP_TYPE = 'Lap Type'
     data_long = pd.melt(
         data,
@@ -135,6 +137,7 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
         split=True,
         scale='count')
     sns_figure.gca().grid(True)
+    sns_figure.tight_layout(rect=[0, 0.03, 1, 0.95])
 
     figures = [comparision_figure, sns_figure]
     hist_bounds = find_hist_bounds(data['s'])
@@ -143,6 +146,7 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
         channels = ','.join(group.CHANNEL.unique())
         pilot_title = '{}({})'.format(pilot, channels)
         figure = plt.figure()
+        figure.suptitle(pilot_title)
         figure.canvas.set_window_title(pilot_title)
         figures.append(figure)
         axes = figure.subplots(2, 1)
@@ -151,10 +155,9 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
             group,
             hist_bounds=hist_bounds)
         plot_pilot(axes, group)
-        for ax in (comparision_axes[comparision_idx][0], axes[0]):
-            ax.set_title(pilot_title)
 
         comparision_idx += 1
+        figure.tight_layout(rect=[0, 0.03, 1, 0.95])
 
     xlims = [[minb, maxb], [0, -math.inf]]
     ylims = [[0, -math.inf], [math.inf, -math.inf]]
@@ -172,6 +175,9 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
         for j, ax in enumerate(axes):
             ax.set_xlim(xlims[j])
             ax.set_ylim(ylims[j])
+
+
+    comparision_figure.tight_layout(rect=[0, 0.03, 1, 0.95])
 
     return figures
 
@@ -198,7 +204,6 @@ def main():
     parser.add_argument('--only-pilot')
     args = parser.parse_args()
 
-    mpl.rcParams["figure.autolayout"] = True
     mpl.rcParams["figure.figsize"] = (12, 9)
 
     data = read_data(args.csv)
@@ -214,7 +219,7 @@ def main():
             chart_path = (
                 args.chart_dir
                 + '/'
-                + get_valid_filename(figure.canvas.get_window_title())
+                + get_valid_filename(figure._suptitle.get_text())
                 + '.png')
             figure.savefig(chart_path, format='png', dpi=200)
     else:
