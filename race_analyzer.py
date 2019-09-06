@@ -97,14 +97,22 @@ def plot_cumbest(ax, data):
     ax.yaxis.set_major_locator(ticker.MultipleLocator(5))
     ax.yaxis.set_minor_locator(ticker.MultipleLocator(1))
     ax.grid(which='both')
-    ax.plot(range(1, len(cummin) + 1), cummin)
+    lines = ax.plot(range(1, len(cummin) + 1), cummin)
+    lines[0].set_label('Min Lap Time')
+    lines[1].set_label('Min 3 Lap Avg Time')
     ax.plot(x, y, 'ro')
 
-    ax.plot(range(1, len(data) + 1), data)
+    lines = ax.plot(range(1, len(data) + 1), data)
+    lines[0].set_label('Lap Time')
+    lines[1].set_label('3 Lap Avg Time')
 
 
 def plot_pilot(axes, data, hist_bounds=None):
-    plot_hist(axes[0], [data['s'], data['best3avg']], bounds=hist_bounds)
+    plot_hist(
+        axes[0],
+        [data['s'], data['best3avg']],
+        bounds=hist_bounds,
+        labels=['Lap Time', '3 Lap Avg Time'])
     plot_cumbest(axes[1], data[['s', 'best3avg']])
 
 
@@ -172,6 +180,8 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
             hist_bounds=hist_bounds)
         comparision_axes[comparision_idx][0].set_title(pilot_title)
         plot_pilot(axes, group)
+        for ax in axes:
+            ax.legend()
 
         comparision_idx += 1
         figure.tight_layout(rect=[0, 0.03, 1, 0.95])
