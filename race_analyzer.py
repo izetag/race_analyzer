@@ -27,39 +27,26 @@ def read_data(csv_path):
 
 
 def calculate_statistics(data):
-   data.loc[:, 'best3'] = data.loc[:, 's'].rolling(3).sum()
-   lap = 0
-   count = 1
-   for row in data.itertuples():
-      if row.LAP == lap + 1:
-         count += 1
-      else:
-         count = 1
-
-      if count < 3:
-         data.at[row.Index, 'best3'] = np.nan
-         lap = row.LAP
-      else:
-         lap += 1
-
-   data.loc[:, 'best3avg'] = data['best3'] / 3.0
+   data.loc[:, 'best3avg'] =  data.loc[:, 's'].rolling(3).mean()
 
 
 def filter_data(data, min_lap_time = 5.0, max_lap_time=60.0, pilot=None):
-    return data.loc[(data['s'] < max_lap_time) & (data['s'] > min_lap_time)].copy()
+   data.loc[(data['s'] > max_lap_time) | (data['s'] < min_lap_time)] = np.nan
+   return data
 
 
 def find_hist_bounds(data):
-    q75, q25 = np.percentile(data, [75 ,25])
-    iqr = q75 - q25
+   data = data.dropna()
+   q75, q25 = np.percentile(data, [75 ,25])
+   iqr = q75 - q25
 
-    minb = q25 - (iqr * 1.5)
-    maxb = q75 + (iqr * 1.5)
+   minb = q25 - (iqr * 1.5)
+   maxb = q75 + (iqr * 1.5)
 
-    minb = max(minb, data.min())
-    maxb = min(maxb, data.max())
+   minb = max(minb, data.min())
+   maxb = min(maxb, data.max())
 
-    return (minb, maxb)
+   return (minb, maxb)
 
 
 def plot_hist(ax, data, labels=None, bin_width=1.0, bounds=None):
@@ -107,6 +94,8 @@ def plot_cumbest(ax, data):
    ax.grid(which='both')
    ax.plot(range(1, len(cummin) + 1), cummin)
    ax.plot(x, y, 'ro')
+
+   ax.plot(range(1, len(data) + 1), data);
 
 
 def plot_pilot(axes, data, hist_bounds=None):
@@ -157,7 +146,6 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
             xlims[j] = [min(xlims[j][0], limx[0]), max(xlims[j][1], limx[1])]
          ylims[j] = [min(ylims[j][0], limy[0]), max(ylims[j][1], limy[1])]
 
-
    for i, axes in enumerate(comparision_axes):
       for j, ax in enumerate(axes):
          ax.set_xlim(xlims[j])
@@ -195,13 +183,12 @@ def main():
    filtered = filter_data(data, pilot=args.only_pilot)
    statistics = calculate_statistics(filtered)
    hist_bounds = [args.hist_left_bound, args.hist_right_bound]
-
-   figure_list = plot(filtered, statistics, bounds=hist_bounds)
+   figures = plot(filtered, statistics, bounds=hist_bounds)
 
    if args.chart_dir:
       if not os.path.exists(args.chart_dir):
          os.makedirs(args.chart_dir)
-      for figure in figure_list:
+      for figure in figures:
            chart_path = args.chart_dir + '/' + get_valid_filename(figure.canvas.get_window_title()) + '.png'
            figure.savefig(chart_path, format='png', dpi=200)
    else:
