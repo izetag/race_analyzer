@@ -165,8 +165,8 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
             if j != 0:
                 xlims[j] = [min(xlims[j][0], limx[0]),
                             max(xlims[j][1], limx[1])]
-                ylims[j] = [min(ylims[j][0], limy[0]),
-                            max(ylims[j][1], limy[1])]
+            ylims[j] = [min(ylims[j][0], limy[0]),
+                        max(ylims[j][1], limy[1])]
 
     for i, axes in enumerate(comparision_axes):
         for j, ax in enumerate(axes):
@@ -210,13 +210,13 @@ def main():
     if args.chart_dir:
         if not os.path.exists(args.chart_dir):
             os.makedirs(args.chart_dir)
-            for figure in figures:
-                chart_path = (
-                    args.chart_dir
-                    + '/'
-                    + get_valid_filename(figure.canvas.get_window_title())
-                    + '.png')
-                figure.savefig(chart_path, format='png', dpi=200)
+        for figure in figures:
+            chart_path = (
+                args.chart_dir
+                + '/'
+                + get_valid_filename(figure.canvas.get_window_title())
+                + '.png')
+            figure.savefig(chart_path, format='png', dpi=200)
     else:
         plt.show()
 
