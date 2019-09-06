@@ -108,6 +108,16 @@ def plot_pilot(axes, data, hist_bounds=None):
     plot_cumbest(axes[1], data[['s', 'best3avg']])
 
 
+def set_hist_axes_titles(ax):
+    ax.set_ylabel('laps')
+    ax.set_xlabel('time[s]')
+
+
+def set_laps_axes_titles(ax):
+    ax.set_xlabel('laps')
+    ax.set_ylabel('time[s]')
+
+
 def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
     grouped = data.groupby('PILOT')
     print(grouped['s'].describe())
@@ -117,6 +127,10 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
     comparision_figure.suptitle('Pilots Comparision')
     comparision_axes = comparision_figure.subplots(len(grouped), 2)
     comparision_idx = 0
+
+    for idx in range(len(grouped)):
+        set_hist_axes_titles(comparision_axes[idx][0])
+        set_laps_axes_titles(comparision_axes[idx][1])
 
     sns_figure = plt.figure()
     sns_figure.canvas.set_window_title('Pilot Violinplot')
@@ -150,10 +164,13 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
         figure.canvas.set_window_title(pilot_title)
         figures.append(figure)
         axes = figure.subplots(2, 1)
+        set_hist_axes_titles(axes[0])
+        set_laps_axes_titles(axes[1])
         plot_pilot(
             comparision_axes[comparision_idx],
             group,
             hist_bounds=hist_bounds)
+        comparision_axes[comparision_idx][0].set_title(pilot_title)
         plot_pilot(axes, group)
 
         comparision_idx += 1
