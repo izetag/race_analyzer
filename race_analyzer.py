@@ -166,7 +166,7 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
     (minb, maxb) = hist_bounds
     for pilot, group in grouped:
         channels = ','.join(group.CHANNEL.unique())
-        pilot_title = '{}({})'.format(pilot, channels)
+        pilot_title = '{} ({})'.format(pilot, channels)
         figure = plt.figure()
         figure.suptitle(pilot_title)
         figure.canvas.set_window_title(pilot_title)
