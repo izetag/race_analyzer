@@ -206,6 +206,17 @@ def plot(data, statistics, bounds, bin_width=1.0, max_lap_time=60.0):
 
     comparision_figure.tight_layout(rect=[0, 0.03, 1, 0.95])
 
+    plt.figure()
+    percentiles = [x / 100.0 for x in range(20, 100)]
+#    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+#       print(grouped['s'].dropna().quantile(percentiles))
+    for pilot, value in grouped:
+        print(pilot)
+        print(value['s'].quantile(percentiles))
+        value['s'].quantile(percentiles).plot()
+    plt.legend()
+    plt.show()
+
     return figures
 
 
